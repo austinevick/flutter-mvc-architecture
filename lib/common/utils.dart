@@ -34,9 +34,9 @@ void showBottomFlash(
               showBtn
                   ? TextButton(
                       onPressed: () {
-                        Navigator.of(navigatorkey.currentContext!).push(
-                            MaterialPageRoute(
-                                builder: (ctx) => SavedMovieView()));
+                        // Navigator.of(navigatorkey.currentContext!).push(
+                        //     MaterialPageRoute(
+                        //         builder: (ctx) => SavedMovieView(page: page)));
                         controller.dismiss();
                       },
                       child: const Text('SHOW'))

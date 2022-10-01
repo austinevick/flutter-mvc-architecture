@@ -1,12 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import '../../common/api.dart';
 import 'home_view_model.dart';
-import 'movie_detail_view.dart';
-import 'saved_movie_view.dart';
 
-final movieFutureProvider = FutureProvider.family((ref, WidgetRef n) =>
-    ref.watch(homeViewNotifier.notifier).searchMovieByname(n));
+final saveMovieFutureProvider = FutureProvider(
+    (ref) => ref.watch(homeViewNotifier.notifier).getSavedMovies());
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -14,71 +15,47 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final n = ref.watch(homeViewNotifier.notifier);
-      final isSearching = ref.watch(homeViewNotifier);
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-          title: isSearching
-              ? TextField(
-                  controller: n.ctrl,
-                  cursorColor: Colors.white,
-                  cursorWidth: 1,
-                  autofocus: true,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w800),
-                  decoration: const InputDecoration(
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      hintText: 'Search movies here'),
-                )
-              : const Text('Movie'),
-          actions: [
-            IconButton(
-                onPressed: () => n.setSearchingState(),
-                icon: Icon(isSearching ? Icons.clear : Icons.search)),
-            IconButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (ctx) => const SavedMovieView())),
-                icon: const Icon(Icons.download))
-          ],
-        ),
-        body: SafeArea(
-            minimum: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Expanded(
-                    child: ref.watch(movieFutureProvider(ref)).when(
-                        data: (data) => data.results == null
-                            ? const Center(
-                                child: Text('No movies to display'),
-                              )
-                            : ListView.builder(
-                                itemCount: data.results!.length,
-                                itemBuilder: (ctx, i) => ListTile(
-                                      onTap: () => Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (ctx) => MovieDetailView(
-                                                  model: data.results![i]))),
-                                      title: Text(data.results![i].title!),
-                                      trailing: const Icon(
-                                          Icons.keyboard_arrow_right),
-                                    )),
-                        error: (e, t) => const Center(
-                              child: Text('Something went wrong'),
-                            ),
-                        loading: () => const Center(
-                              child: CircularProgressIndicator(),
-                            )))
-              ],
-            )),
-        floatingActionButton: isSearching
-            ? FloatingActionButton(
-                backgroundColor: Colors.red,
-                child: const Icon(Icons.search, color: Colors.white),
-                onPressed: () => ref.refresh(movieFutureProvider(ref)))
-            : null,
-      );
+          appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: const Color(0xff1d2127),
+            title: const Text('Saved Movies'),
+          ),
+          body: SafeArea(
+              minimum: const EdgeInsets.all(0),
+              child: ref.watch(saveMovieFutureProvider).when(
+                  data: (data) => data.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No search history\nBegin by clicking the + button to search and save your favorite movies here.',
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : MasonryGridView.count(
+                          itemCount: data.length,
+                          crossAxisCount: 2,
+                          itemBuilder: (ctx, i) => Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) => const Center(
+                                      child: SpinKitDoubleBounce(
+                                          color: Colors.grey)),
+                                  fit: BoxFit.cover,
+                                  imageUrl: baseImageUrl + data[i].image!,
+                                ),
+                              ))),
+                  error: (e, t) => const Center(
+                        child: Text('Something went wrong'),
+                      ),
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ))));
     });
   }
 }

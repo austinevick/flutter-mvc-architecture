@@ -7,7 +7,7 @@ import '../apikey.dart';
 import '../common/api.dart';
 import '../model/movie_model.dart';
 
-final mealRepositoryProvider =
+final movieRepositoryProvider =
     Provider((ref) => MovieRepositoryServiceImpl(Client()));
 
 abstract class MovieRepositoryService {

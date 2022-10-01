@@ -30,7 +30,7 @@ class SavedMovieModel {
       id: map['id'],
       title: map['title'] ?? '',
       image: map['image'],
-      movieId: map['movieId'] ?? '',
+      movieId: map['movieId'],
       overview: map['overview'] ?? '',
       releaseDate: map['releaseDate'] ?? '',
     );

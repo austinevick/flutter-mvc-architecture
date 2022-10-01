@@ -1,17 +1,13 @@
+import 'package:movie_search_app/model/search_history.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../model/saved_movie_model.dart';
-
-class LocalMovieRepositoryService {
-  static const String TABLE = 'movie';
-  static const String DB_NAME = 'movie.db';
+class SearchHistoryRepository {
+  static const String TABLE = 'searchHistory';
+  static const String DB_NAME = 'searchHistory.db';
   static const String ID = 'id';
   static const String TITLE = 'title';
-  static const String RELEASEDATE = 'releaseDate';
   static const String IMAGE = 'image';
-  static const String OVERVIEW = 'overview';
-  static const String MOVIEID = 'movieId';
 
   static Future<Database?> get _db async => await initDB();
 
@@ -23,21 +19,21 @@ class LocalMovieRepositoryService {
 
   static createDatabase(Database db, int version) async {
     await db.execute(
-        '''CREATE TABLE $TABLE ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $TITLE TEXT, $RELEASEDATE TEXT, $MOVIEID INTEGER, $IMAGE TEXT, $OVERVIEW TEXT)''');
+        '''CREATE TABLE $TABLE ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $TITLE TEXT,  $IMAGE TEXT)''');
   }
 
-  static Future<int> saveMovie(SavedMovieModel model) async {
+  static Future<int> saveSearchHistory(SearchHistoryModel model) async {
     var dbClient = await _db;
     return await dbClient!.insert(TABLE, model.toMap());
   }
 
-  static Future<List<SavedMovieModel>> getSavedMovies() async {
+  static Future<List<SearchHistoryModel>> getSearchHistory() async {
     var dbClient = await _db;
     List<Map<String, dynamic>> map = await dbClient!.query(TABLE);
-    return map.map((e) => SavedMovieModel.fromMap(e)).toList();
+    return map.map((e) => SearchHistoryModel.fromMap(e)).toList();
   }
 
-  static Future<int> deleteSearchMovie(int id) async {
+  static Future<int> deleteSearchHistory(int id) async {
     var dbClient = await _db;
     return dbClient!.delete(TABLE, where: '$ID = ?', whereArgs: [id]);
   }

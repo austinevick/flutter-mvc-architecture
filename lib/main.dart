@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_search_app/view/bottom_navigation_view.dart';
 import 'common/utils.dart';
 import 'view/home_view/home_view.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData.dark(),
-        home: const HomeView(),
+        home: const BottomNavigationView(),
         navigatorKey: navigatorkey,
       ),
     );

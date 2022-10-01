@@ -2,12 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:movie_search_app/widget/button_loader.dart';
 import '../../common/api.dart';
 import '../../model/movie_model.dart';
-import '../../model/saved_movie_model.dart';
 import '../../widget/custom_button.dart';
 import 'home_view_model.dart';
-import 'saved_movie_view.dart';
+
+final movieIdFutureProvider = FutureProvider.family((ref, int id) =>
+    ref.watch(homeViewNotifier.notifier).checkIfMovieExist(id));
 
 class MovieDetailView extends StatelessWidget {
   final Results model;
@@ -16,6 +18,8 @@ class MovieDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
+      ref.watch(homeViewNotifier.notifier).getSavedMovieId(model.id!);
+      bool isLoading = ref.watch(homeViewNotifier);
       final n = ref.watch(homeViewNotifier.notifier);
       return Scaffold(
         body: Stack(
@@ -31,6 +35,7 @@ class MovieDetailView extends StatelessWidget {
                     child: SpinKitDoubleBounce(color: Colors.grey)),
                 fit: BoxFit.cover,
                 imageUrl: baseImageUrl + model.posterPath!,
+                errorWidget: ((context, url, error) => Container()),
               ),
             ),
             Positioned(
@@ -63,21 +68,26 @@ class MovieDetailView extends StatelessWidget {
                                 fontSize: 16, fontWeight: FontWeight.w800),
                           )),
                       Text(model.overview!),
-                      Spacer(),
-                      CustomButton(
-                        radius: 16,
-                        color: Colors.red,
-                        text: 'Save to device',
-                        onPressed: () {
-                          final movie = SavedMovieModel(
-                              title: model.title,
-                              overview: model.overview,
-                              image: baseImageUrl + model.posterPath!);
-                          print(movie);
-                          n.saveMovie(movie);
-                          ref.refresh(saveMovieFutureProvider);
-                        },
-                      )
+                      const Spacer(),
+                      ref.watch(movieIdFutureProvider(model.id!)).when(
+                          data: (data) => !data
+                              ? CustomButton(
+                                  radius: 16,
+                                  color: Colors.red,
+                                  text: 'Save to device',
+                                  onPressed: () => n.saveMovie(ref, model),
+                                )
+                              : CustomButton(
+                                  radius: 16,
+                                  color: Colors.red,
+                                  child: ButtonLoader(
+                                      isLoading: isLoading,
+                                      text: 'Remove from device'),
+                                  onPressed: () =>
+                                      n.removeSavedMovie(ref, model),
+                                ),
+                          error: (e, t) => const SizedBox.shrink(),
+                          loading: () => const SizedBox.shrink())
                     ],
                   ),
                 ),
