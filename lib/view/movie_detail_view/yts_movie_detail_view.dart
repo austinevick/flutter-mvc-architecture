@@ -2,23 +2,26 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:movie_search_app/model/yts_movie_model.dart';
+import 'package:movie_search_app/view/movie_detail_view/movie_detail_view_model.dart';
 import 'package:movie_search_app/widget/button_loader.dart';
 import '../../common/api.dart';
-import '../../model/movie_model.dart';
+import '../../model/tmdb_movie_model.dart';
 import '../../widget/custom_button.dart';
-import 'home_view_model.dart';
+import '../home_view/home_view_model.dart';
 
-final movieIdFutureProvider = FutureProvider.family((ref, int id) =>
-    ref.watch(homeViewNotifier.notifier).checkIfMovieExist(id));
+final ytsmovieFutureProvider = FutureProvider.family((ref, String id) =>
+    ref.watch(movieDetailViewNotifier).getYTSMovieDetailsById(id));
 
-class MovieDetailView extends StatelessWidget {
-  final Results model;
-  const MovieDetailView({super.key, required this.model});
+class YTSMovieDetailView extends StatelessWidget {
+  final YTSMoviesResponseModel model;
+  const YTSMovieDetailView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      ref.watch(homeViewNotifier.notifier).getSavedMovieId(model.id!);
+      ref.watch(movieDetailViewNotifier).ref = ref;
+
       bool isLoading = ref.watch(homeViewNotifier);
       final n = ref.watch(homeViewNotifier.notifier);
       return Scaffold(
@@ -34,7 +37,7 @@ class MovieDetailView extends StatelessWidget {
                 placeholder: (context, url) => const Center(
                     child: SpinKitDoubleBounce(color: Colors.grey)),
                 fit: BoxFit.cover,
-                imageUrl: baseImageUrl + model.posterPath!,
+                imageUrl: model.largeCoverImage!,
                 errorWidget: ((context, url, error) => Container()),
               ),
             ),
@@ -58,7 +61,7 @@ class MovieDetailView extends StatelessWidget {
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w800),
                       ),
-                      Text(model.releaseDate!),
+                      Text(model.year.toString()),
                       const SizedBox(height: 15),
                       const Align(
                           alignment: Alignment.centerLeft,
@@ -67,27 +70,27 @@ class MovieDetailView extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w800),
                           )),
-                      Text(model.overview!),
+                      Text(model.summary!),
                       const Spacer(),
-                      ref.watch(movieIdFutureProvider(model.id!)).when(
-                          data: (data) => !data
-                              ? CustomButton(
-                                  radius: 16,
-                                  color: Colors.red,
-                                  text: 'Save to device',
-                                  onPressed: () => n.saveMovie(ref, model),
-                                )
-                              : CustomButton(
-                                  radius: 16,
-                                  color: Colors.red,
-                                  child: ButtonLoader(
-                                      isLoading: isLoading,
-                                      text: 'Remove from device'),
-                                  onPressed: () =>
-                                      n.removeSavedMovie(ref, model),
-                                ),
-                          error: (e, t) => const SizedBox.shrink(),
-                          loading: () => const SizedBox.shrink())
+                      // ref.watch(movieIdFutureProvider(model.id!)).when(
+                      //     data: (data) => !data
+                      //         ? CustomButton(
+                      //             radius: 16,
+                      //             color: Colors.red,
+                      //             text: 'Save to device',
+                      //             onPressed: () => n.saveMovie(ref, model),
+                      //           )
+                      //         : CustomButton(
+                      //             radius: 16,
+                      //             color: Colors.red,
+                      //             child: ButtonLoader(
+                      //                 isLoading: isLoading,
+                      //                 text: 'Remove from device'),
+                      //             onPressed: () =>
+                      //                 n.removeSavedMovie(ref, model),
+                      //           ),
+                      //     error: (e, t) => const SizedBox.shrink(),
+                      //     loading: () => const SizedBox.shrink())
                     ],
                   ),
                 ),

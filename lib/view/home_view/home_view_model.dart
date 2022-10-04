@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../common/api.dart';
 import '../../common/utils.dart';
-import '../../model/movie_model.dart';
+import '../../model/tmdb_movie_model.dart';
 import '../../model/saved_movie_model.dart';
 import '../../service/local_movie_repository_service.dart';
+import '../movie_detail_view/movie_detail_view_model.dart';
 import 'home_view.dart';
-import 'movie_detail_view.dart';
 
 final homeViewNotifier =
     StateNotifierProvider<HomeViewModel, bool>((ref) => HomeViewModel());
@@ -13,35 +13,27 @@ final homeViewNotifier =
 class HomeViewModel extends StateNotifier<bool> {
   HomeViewModel() : super(false);
 
-  void setSearchingState() {
-    state = !state;
-  }
-
-  Future<int> saveMovie(WidgetRef ref, Results model) async {
+  Future<void> saveMovie(WidgetRef ref, TMDBMovieResponseData model) async {
     final movie = SavedMovieModel(
         title: model.title,
         movieId: model.id,
         overview: model.overview,
         image: baseImageUrl + model.posterPath!);
     try {
-      final result = await LocalMovieRepositoryService.saveMovie(movie);
+      await LocalMovieRepositoryService.saveMovie(movie);
       Future.delayed(const Duration(seconds: 2), () {
         state = true;
         ref.refresh(saveMovieFutureProvider);
         ref.refresh(movieIdFutureProvider(model.id!));
       });
-      showBottomFlash(
-          content: 'Movie was successfully saved.',
-          showBtn: true,
-          page: result);
-      return result;
+      showBottomFlash(content: 'Movie was successfully saved.');
     } catch (e) {
       showBottomFlash(content: 'Something went wrong');
       rethrow;
     }
   }
 
-  void removeSavedMovie(WidgetRef ref, Results m) async {
+  void removeSavedMovie(WidgetRef ref, TMDBMovieResponseData m) async {
     try {
       state = true;
       final id = await getSavedMovieId(m.id!);
@@ -68,7 +60,7 @@ class HomeViewModel extends StateNotifier<bool> {
     return movieId;
   }
 
-  Future<bool> checkIfMovieExist(int id) async {
+  Future<bool> checkIfMovieExistInDatabase(int id) async {
     final movie = await getSavedMovies();
     bool isAvailable = false;
     for (var i = 0; i < movie.length; i++) {
@@ -86,4 +78,7 @@ class HomeViewModel extends StateNotifier<bool> {
   Future<void> deleteMovie(int id) async {
     await LocalMovieRepositoryService.deleteSearchMovie(id);
   }
+
+  String emptyViewText =
+      "No search history\nBegin by clicking the + button to search and save your favorite movies here.";
 }

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_search_app/view/movie_detail_view/tmdb_movie_detail_view.dart';
 import 'package:movie_search_app/view/search_history_view/search_history_view_model.dart';
 import 'package:movie_search_app/widget/custom_textfield.dart';
 import 'package:movie_search_app/widget/search_history_list.dart';
 
-import '../home_view/movie_detail_view.dart';
+import '../movie_detail_view/yts_movie_detail_view.dart';
 
 final searchMovieFutureProvider = FutureProvider.family.autoDispose(
     (ref, WidgetRef n) =>
-        ref.watch(searchHistoryViewNotifier).searchMovieByName(n));
+        ref.watch(searchHistoryViewNotifier).searchTMDBMoviesByTitle(n));
 
 final searchHistoryFutureProvider = FutureProvider.autoDispose(
     (ref) => ref.watch(searchHistoryViewNotifier).getSearchHistory());
 
 class MovieSearchView extends StatelessWidget {
   const MovieSearchView({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
@@ -55,8 +55,10 @@ class MovieSearchView extends StatelessWidget {
                                       n.saveSearchHistory(data.results![i]);
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
-                                              builder: (ctx) => MovieDetailView(
-                                                  model: data.results![i])));
+                                              builder: (ctx) =>
+                                                  TMDBMovieDetailView(
+                                                      id: data
+                                                          .results![i].id!)));
                                     },
                                     title: Text(data.results![i].title!),
                                     trailing:

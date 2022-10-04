@@ -8,6 +8,9 @@ class SearchHistoryRepository {
   static const String ID = 'id';
   static const String TITLE = 'title';
   static const String IMAGE = 'image';
+  static const String RELEASEDATE = 'releaseDate';
+  static const String OVERVIEW = 'overview';
+  static const String MOVIEID = 'movieId';
 
   static Future<Database?> get _db async => await initDB();
 
@@ -19,7 +22,7 @@ class SearchHistoryRepository {
 
   static createDatabase(Database db, int version) async {
     await db.execute(
-        '''CREATE TABLE $TABLE ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $TITLE TEXT,  $IMAGE TEXT)''');
+        '''CREATE TABLE $TABLE ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $TITLE TEXT, $RELEASEDATE TEXT, $MOVIEID INTEGER, $IMAGE TEXT, $OVERVIEW TEXT)''');
   }
 
   static Future<int> saveSearchHistory(SearchHistoryModel model) async {

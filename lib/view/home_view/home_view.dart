@@ -15,6 +15,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
+      final n = ref.watch(homeViewNotifier.notifier);
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -25,14 +26,17 @@ class HomeView extends StatelessWidget {
               minimum: const EdgeInsets.all(0),
               child: ref.watch(saveMovieFutureProvider).when(
                   data: (data) => data.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No search history\nBegin by clicking the + button to search and save your favorite movies here.',
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800),
-                            textAlign: TextAlign.center,
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              n.emptyViewText,
+                              style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         )
                       : MasonryGridView.count(

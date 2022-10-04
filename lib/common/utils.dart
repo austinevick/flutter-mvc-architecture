@@ -1,8 +1,6 @@
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 
-import '../view/home_view/saved_movie_view.dart';
-
 final navigatorkey = GlobalKey<NavigatorState>();
 
 void showBottomFlash(
@@ -48,3 +46,6 @@ void showBottomFlash(
     },
   );
 }
+
+const noConnection = 'No internet connection';
+const somethingwentwrong = 'Something went wrong';
