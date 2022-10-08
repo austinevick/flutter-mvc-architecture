@@ -1,25 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:movie_search_app/controller/movie_remote_repository_controller.dart';
+import 'package:movie_search_app/controller/movie_search_history_controller.dart';
 import 'package:movie_search_app/view/movie_detail_view/tmdb_movie_detail_view.dart';
-import 'package:movie_search_app/view/search_history_view/search_history_view_model.dart';
 import 'package:movie_search_app/widget/custom_textfield.dart';
+import 'package:movie_search_app/widget/movie_error_widget.dart';
 import 'package:movie_search_app/widget/search_history_list.dart';
-
-import '../movie_detail_view/yts_movie_detail_view.dart';
-
-final searchMovieFutureProvider = FutureProvider.family.autoDispose(
-    (ref, WidgetRef n) =>
-        ref.watch(searchHistoryViewNotifier).searchTMDBMoviesByTitle(n));
-
-final searchHistoryFutureProvider = FutureProvider.autoDispose(
-    (ref) => ref.watch(searchHistoryViewNotifier).getSearchHistory());
+import '../../common/api.dart';
+import '../../providers.dart';
 
 class MovieSearchView extends StatelessWidget {
   const MovieSearchView({super.key});
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final n = ref.watch(searchHistoryViewNotifier);
+      final movieRepositoryCtrl = ref.watch(movieRemoteRepositoryController);
+      final movieHistoryCtrl = ref.watch(movieSearchHistoryController);
       return Scaffold(
         appBar: PreferredSize(
             preferredSize: const Size(60, 60),
@@ -33,14 +31,14 @@ class MovieSearchView extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                       child: CustomTextField(
-                    controller: n.ctrl,
+                    controller: movieRepositoryCtrl.ctrl,
                   )),
                 ],
               ),
             )),
         body: SafeArea(
           minimum: const EdgeInsets.symmetric(horizontal: 16),
-          child: n.ctrl.text.isEmpty
+          child: movieRepositoryCtrl.ctrl.text.isEmpty
               ? const SearchHistoryList()
               : ref.watch(searchMovieFutureProvider(ref)).when(
                   data: (data) => data.results == null
@@ -52,7 +50,8 @@ class MovieSearchView extends StatelessWidget {
                               itemBuilder: (ctx, i) => ListTile(
                                     onTap: () {
                                       Navigator.of(context).pop();
-                                      n.saveSearchHistory(data.results![i]);
+                                      movieHistoryCtrl
+                                          .saveSearchHistory(data.results![i]);
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (ctx) =>
@@ -60,13 +59,32 @@ class MovieSearchView extends StatelessWidget {
                                                       id: data
                                                           .results![i].id!)));
                                     },
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: CachedNetworkImage(
+                                        alignment: Alignment.topCenter,
+                                        placeholder: (context, url) =>
+                                            const Center(
+                                                child: SpinKitDoubleBounce(
+                                                    color: Colors.grey)),
+                                        fit: BoxFit.cover,
+                                        height: 50,
+                                        width: 50,
+                                        imageUrl: baseImageUrl +
+                                            data.results![i].posterPath!,
+                                        errorWidget: ((context, url, error) =>
+                                            Container()),
+                                      ),
+                                    ),
                                     title: Text(data.results![i].title!),
                                     trailing:
                                         const Icon(Icons.keyboard_arrow_right),
                                   )),
                         ),
-                  error: (e, t) => const Center(
-                        child: Text('Something went wrong'),
+                  error: (e, t) => Center(
+                        child: MovieErrorWidget(
+                            onTap: () =>
+                                ref.refresh(searchMovieFutureProvider(ref))),
                       ),
                   loading: () => const Center(
                         child: CircularProgressIndicator(),

@@ -1,13 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:movie_search_app/widget/movie_list_widget.dart';
 import '../../common/api.dart';
-import 'home_view_model.dart';
-
-final saveMovieFutureProvider = FutureProvider(
-    (ref) => ref.watch(homeViewNotifier.notifier).getSavedMovies());
+import '../../common/utils.dart';
+import '../../providers.dart';
+import '../movie_detail_view/tmdb_movie_detail_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -15,12 +13,12 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final n = ref.watch(homeViewNotifier.notifier);
+     
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff1d2127),
-            title: const Text('Saved Movies'),
+            title: const Text('My Movie Collections'),
           ),
           body: SafeArea(
               minimum: const EdgeInsets.all(0),
@@ -28,35 +26,21 @@ class HomeView extends StatelessWidget {
                   data: (data) => data.isEmpty
                       ? Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              n.emptyViewText,
-                              style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        )
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(emptyViewText,
+                                  style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800),
+                                  textAlign: TextAlign.center)))
                       : MasonryGridView.count(
                           itemCount: data.length,
                           crossAxisCount: 2,
-                          itemBuilder: (ctx, i) => Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => const Center(
-                                      child: SpinKitDoubleBounce(
-                                          color: Colors.grey)),
-                                  fit: BoxFit.cover,
-                                  imageUrl: baseImageUrl + data[i].image!,
-                                ),
-                              ))),
-                  error: (e, t) => const Center(
-                        child: Text('Something went wrong'),
-                      ),
+                          itemBuilder: (ctx, i) => MovieListWidget(
+                              image: baseImageUrl + data[i].image!,
+                              child:
+                                  TMDBMovieDetailView(id: data[i].movieId!))),
+                  error: (e, t) => const SizedBox.shrink(),
                   loading: () => const Center(
                         child: CircularProgressIndicator(),
                       ))));

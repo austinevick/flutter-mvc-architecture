@@ -16,17 +16,17 @@ class ButtonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Text(
-            text!,
-            style: TextStyle(
-                color: color, fontWeight: FontWeight.w700, fontSize: 17),
-          )
-        : Center(
+        ? Center(
             child: SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
                     color: spinnerColor ?? Colors.white, strokeWidth: 2)),
+          )
+        : Text(
+            text!,
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.w700, fontSize: 17),
           );
   }
 }

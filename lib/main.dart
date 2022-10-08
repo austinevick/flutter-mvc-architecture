@@ -4,6 +4,8 @@ import 'package:movie_search_app/view/bottom_navigation_view.dart';
 import 'common/utils.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  hasInternetConnection();
   runApp(const MyApp());
 }
 

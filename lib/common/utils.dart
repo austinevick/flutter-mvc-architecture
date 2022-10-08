@@ -1,10 +1,18 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 
 final navigatorkey = GlobalKey<NavigatorState>();
 
-void showBottomFlash(
-    {String? title, String? content, bool showBtn = false, int? page}) {
+void hasInternetConnection() {
+  Connectivity().onConnectivityChanged.listen((event) {
+    if (event == ConnectivityResult.none) {
+      showDialogFlash();
+    }
+  });
+}
+
+void showBottomFlash({String? title, String? content}) {
   showFlash(
     context: navigatorkey.currentContext!,
     builder: (_, controller) {
@@ -29,16 +37,6 @@ void showBottomFlash(
               TextButton(
                   onPressed: () => controller.dismiss(),
                   child: const Text('DISMISS')),
-              showBtn
-                  ? TextButton(
-                      onPressed: () {
-                        // Navigator.of(navigatorkey.currentContext!).push(
-                        //     MaterialPageRoute(
-                        //         builder: (ctx) => SavedMovieView(page: page)));
-                        controller.dismiss();
-                      },
-                      child: const Text('SHOW'))
-                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -47,5 +45,20 @@ void showBottomFlash(
   );
 }
 
+void showDialogFlash() {
+  navigatorkey.currentContext!.showFlashDialog(
+      constraints: const BoxConstraints(maxWidth: 300),
+      title: const Text('Internet connection', style: TextStyle(fontSize: 16)),
+      content: const Text(
+          'You are currently offline, turn on your mobile data or wifi to connect.',
+          style: TextStyle(fontSize: 14)),
+      positiveActionBuilder: (context, controller, _) {
+        return TextButton(
+            onPressed: () => controller.dismiss(), child: const Text('OK'));
+      });
+}
+
 const noConnection = 'No internet connection';
 const somethingwentwrong = 'Something went wrong';
+String emptyViewText =
+    "No search history\nBegin by clicking the + button to search and save your favorite movies here.";

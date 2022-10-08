@@ -1,19 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:movie_search_app/common/api.dart';
 import 'package:movie_search_app/view/movie_detail_view/tmdb_movie_detail_view.dart';
 import 'package:movie_search_app/view/movie_detail_view/yts_movie_detail_view.dart';
-
-import 'explore_movies_view_model.dart';
-
-final ytsMovieFutureProvider = FutureProvider.family(
-    (ref, WidgetRef n) => ref.watch(exploreMoviesViewNotifier).getYTSMovies(n));
-
-final tmdbMovieFutureProvider = FutureProvider.family((ref, WidgetRef n) =>
-    ref.watch(exploreMoviesViewNotifier).getTMDBMovies(n));
+import 'package:movie_search_app/widget/movie_error_widget.dart';
+import 'package:movie_search_app/widget/movie_list_widget.dart';
+import '../../providers.dart';
 
 class ExploreMovieView extends StatelessWidget {
   const ExploreMovieView({super.key});
@@ -43,28 +36,12 @@ class ExploreMovieView extends StatelessWidget {
                 data: (data) => MasonryGridView.count(
                     itemCount: data!.length,
                     crossAxisCount: 2,
-                    itemBuilder: (ctx, i) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MaterialButton(
-                          padding: const EdgeInsets.all(0),
-                          onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (ctx) =>
-                                      TMDBMovieDetailView(id: data[i].id!))),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => const Center(
-                                  child:
-                                      SpinKitDoubleBounce(color: Colors.grey)),
-                              fit: BoxFit.cover,
-                              imageUrl: baseImageUrl + data[i].posterPath!,
-                            ),
-                          ),
-                        ))),
-                error: (e, t) => const Center(
-                      child: Text('Something went wrong'),
-                    ),
+                    itemBuilder: (ctx, i) => MovieListWidget(
+                          image: baseImageUrl + data[i].posterPath!,
+                          child: TMDBMovieDetailView(id: data[i].id!),
+                        )),
+                error: (e, t) => MovieErrorWidget(
+                    onTap: () => ref.refresh(tmdbMovieFutureProvider(ref))),
                 loading: () => const Center(
                       child: CircularProgressIndicator(),
                     )),
@@ -72,28 +49,11 @@ class ExploreMovieView extends StatelessWidget {
                 data: (data) => MasonryGridView.count(
                     itemCount: data.length,
                     crossAxisCount: 2,
-                    itemBuilder: (ctx, i) => MaterialButton(
-                          padding: const EdgeInsets.all(0),
-                          onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (ctx) =>
-                                      YTSMovieDetailView(model: data[i]))),
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => const Center(
-                                      child: SpinKitDoubleBounce(
-                                          color: Colors.grey)),
-                                  fit: BoxFit.cover,
-                                  imageUrl: data[i].largeCoverImage!,
-                                ),
-                              )),
-                        )),
-                error: (e, t) => const Center(
-                      child: Text('Something went wrong'),
-                    ),
+                    itemBuilder: (ctx, i) => MovieListWidget(
+                        image: data[i].largeCoverImage!,
+                        child: YTSMovieDetailView(model: data[i]))),
+                error: (e, t) => MovieErrorWidget(
+                    onTap: () => ref.refresh(ytsMovieFutureProvider(ref))),
                 loading: () => const Center(
                       child: CircularProgressIndicator(),
                     )),

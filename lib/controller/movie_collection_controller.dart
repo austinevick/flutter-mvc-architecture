@@ -1,34 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../common/api.dart';
-import '../../common/utils.dart';
-import '../../model/tmdb_movie_model.dart';
-import '../../model/saved_movie_model.dart';
-import '../../service/local_movie_repository_service.dart';
-import '../movie_detail_view/movie_detail_view_model.dart';
-import 'home_view.dart';
+import '../common/api.dart';
+import '../common/utils.dart';
+import '../model/saved_movie_model.dart';
+import '../model/tmdb_movie_model.dart';
+import '../providers.dart';
+import '../service/local_movie_repository_service.dart';
 
-final homeViewNotifier =
-    StateNotifierProvider<HomeViewModel, bool>((ref) => HomeViewModel());
+final movieCollectionController =
+    StateNotifierProvider<MovieCollectionController, bool>(
+        (ref) => MovieCollectionController());
 
-class HomeViewModel extends StateNotifier<bool> {
-  HomeViewModel() : super(false);
+class MovieCollectionController extends StateNotifier<bool> {
+  MovieCollectionController() : super(false);
 
-  Future<void> saveMovie(WidgetRef ref, TMDBMovieResponseData model) async {
+  Future<void> saveMovieToDevice(
+      WidgetRef ref, TMDBMovieResponseData model) async {
     final movie = SavedMovieModel(
         title: model.title,
         movieId: model.id,
         overview: model.overview,
         image: baseImageUrl + model.posterPath!);
     try {
+      state = true;
       await LocalMovieRepositoryService.saveMovie(movie);
-      Future.delayed(const Duration(seconds: 2), () {
-        state = true;
+      await Future.delayed(
+        const Duration(seconds: 2),
+      ).whenComplete(() {
+        //state = true;
         ref.refresh(saveMovieFutureProvider);
-        ref.refresh(movieIdFutureProvider(model.id!));
+        ref.refresh(movieExistInCollectionFutureProvider(model.id!));
       });
       showBottomFlash(content: 'Movie was successfully saved.');
+      state = false;
     } catch (e) {
-      showBottomFlash(content: 'Something went wrong');
+      state = false;
+      showBottomFlash(content: somethingwentwrong);
       rethrow;
     }
   }
@@ -37,10 +43,12 @@ class HomeViewModel extends StateNotifier<bool> {
     try {
       state = true;
       final id = await getSavedMovieId(m.id!);
-      deleteMovie(id);
+      await deleteMovie(id);
       ref.refresh(saveMovieFutureProvider);
-      Future.delayed(const Duration(seconds: 2),
-          () => ref.refresh(movieIdFutureProvider(m.id!)));
+      await Future.delayed(
+        const Duration(seconds: 2),
+      ).whenComplete(
+          () => ref.refresh(movieExistInCollectionFutureProvider(m.id!)));
       state = false;
     } catch (e) {
       state = false;
@@ -78,7 +86,4 @@ class HomeViewModel extends StateNotifier<bool> {
   Future<void> deleteMovie(int id) async {
     await LocalMovieRepositoryService.deleteSearchMovie(id);
   }
-
-  String emptyViewText =
-      "No search history\nBegin by clicking the + button to search and save your favorite movies here.";
 }

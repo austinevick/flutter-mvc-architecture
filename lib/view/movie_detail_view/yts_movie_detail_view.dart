@@ -2,16 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:movie_search_app/controller/movie_remote_repository_controller.dart';
 import 'package:movie_search_app/model/yts_movie_model.dart';
-import 'package:movie_search_app/view/movie_detail_view/movie_detail_view_model.dart';
-import 'package:movie_search_app/widget/button_loader.dart';
-import '../../common/api.dart';
-import '../../model/tmdb_movie_model.dart';
-import '../../widget/custom_button.dart';
-import '../home_view/home_view_model.dart';
-
-final ytsmovieFutureProvider = FutureProvider.family((ref, String id) =>
-    ref.watch(movieDetailViewNotifier).getYTSMovieDetailsById(id));
 
 class YTSMovieDetailView extends StatelessWidget {
   final YTSMoviesResponseModel model;
@@ -20,10 +12,8 @@ class YTSMovieDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      ref.watch(movieDetailViewNotifier).ref = ref;
+      ref.watch(movieRemoteRepositoryController).ref = ref;
 
-      bool isLoading = ref.watch(homeViewNotifier);
-      final n = ref.watch(homeViewNotifier.notifier);
       return Scaffold(
         body: Stack(
           clipBehavior: Clip.none,
