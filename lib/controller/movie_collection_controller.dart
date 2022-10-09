@@ -30,7 +30,7 @@ class MovieCollectionController extends StateNotifier<bool> {
         ref.refresh(saveMovieFutureProvider);
         ref.refresh(movieExistInCollectionFutureProvider(model.id!));
       });
-      showBottomFlash(content: 'Movie was successfully saved.');
+      showBottomFlash(content: 'Movie was successfully saved to device.');
       state = false;
     } catch (e) {
       state = false;
@@ -49,6 +49,7 @@ class MovieCollectionController extends StateNotifier<bool> {
         const Duration(seconds: 2),
       ).whenComplete(
           () => ref.refresh(movieExistInCollectionFutureProvider(m.id!)));
+      showBottomFlash(content: 'Movie was successfully removed from device.');
       state = false;
     } catch (e) {
       state = false;

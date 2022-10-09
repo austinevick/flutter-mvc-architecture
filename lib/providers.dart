@@ -14,16 +14,24 @@ final movieExistInCollectionFutureProvider = FutureProvider.family(
         .watch(movieCollectionController.notifier)
         .checkIfMovieExistInDatabase(id));
 final tmdbmovieFutureProvider = FutureProvider.family.autoDispose(
-    (ref, String id) =>
-        ref.watch(movieRemoteRepositoryController).getTMDBMovieDetailsById(id));
+    (ref, String id) => ref
+        .watch(movieRemoteRepositoryController.notifier)
+        .getTMDBMovieDetailsById(id));
 final ytsmovieFutureProvider = FutureProvider.family.autoDispose(
-    (ref, String id) =>
-        ref.watch(movieRemoteRepositoryController).getYTSMovieDetailsById(id));
+    (ref, String id) => ref
+        .watch(movieRemoteRepositoryController.notifier)
+        .getYTSMovieDetailsById(id));
 
 //Movie search view providers
-final searchMovieFutureProvider = FutureProvider.family.autoDispose(
-    (ref, WidgetRef n) =>
-        ref.watch(movieRemoteRepositoryController).searchTMDBMoviesByTitle(n));
+final searchTMDBMovieFutureProvider = FutureProvider.family.autoDispose(
+    (ref, WidgetRef n) => ref
+        .watch(movieRemoteRepositoryController.notifier)
+        .searchTMDBMoviesByTitle(n));
+
+final searchYTSMovieFutureProvider = FutureProvider.family.autoDispose(
+    (ref, WidgetRef n) => ref
+        .watch(movieRemoteRepositoryController.notifier)
+        .searchYTSMoviesByTitle(n));
 
 final searchedMovieExistFutureProvider = FutureProvider.family((ref, int id) =>
     ref
@@ -33,11 +41,11 @@ final searchedMovieExistFutureProvider = FutureProvider.family((ref, int id) =>
 //Explore movies view providers
 final ytsMovieFutureProvider = FutureProvider.family.autoDispose(
     (ref, WidgetRef n) =>
-        ref.watch(movieRemoteRepositoryController).getYTSMovies(n));
+        ref.watch(movieRemoteRepositoryController.notifier).getYTSMovies(n));
 
 final tmdbMovieFutureProvider = FutureProvider.family.autoDispose(
     (ref, WidgetRef n) =>
-        ref.watch(movieRemoteRepositoryController).getTMDBMovies(n));
+        ref.watch(movieRemoteRepositoryController.notifier).getTMDBMovies(n));
 
 //Search history list provider
 

@@ -69,10 +69,12 @@ class RemoteMovieRepositoryServiceImpl implements RemoteMovieRepositoryService {
   }
 
   @override
-  Future searchYTSMoviesByTitle(String name) async {
+  Future<List<YTSMoviesResponseModel>> searchYTSMoviesByTitle(
+      String name) async {
     final response =
         await client.get(Uri.parse("$baseUrlForYTSMovies?query_term=$name"));
     final data = jsonDecode(response.body);
+    print(data);
     Iterable movies = data['data']['movies'];
     print(movies);
     return movies.map((e) => YTSMoviesResponseModel.fromJson(e)).toList();

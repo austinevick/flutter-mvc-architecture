@@ -1,7 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class MovieListWidget extends StatelessWidget {
@@ -20,6 +18,7 @@ class MovieListWidget extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: CachedNetworkImage(
+              errorWidget: (context, url, error) => Container(),
               placeholder: (context, url) =>
                   const Center(child: SpinKitDoubleBounce(color: Colors.grey)),
               fit: BoxFit.cover,

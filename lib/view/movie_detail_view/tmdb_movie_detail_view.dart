@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:movie_search_app/controller/movie_collection_controller.dart';
 import 'package:movie_search_app/controller/movie_remote_repository_controller.dart';
+import 'package:movie_search_app/model/tmdb_movie_model.dart';
 import 'package:movie_search_app/providers.dart';
 import 'package:movie_search_app/widget/button_loader.dart';
+import 'package:movie_search_app/widget/movie_error_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../common/api.dart';
 import '../../widget/custom_button.dart';
 
@@ -16,7 +19,7 @@ class TMDBMovieDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      ref.watch(movieRemoteRepositoryController).ref = ref;
+      ref.watch(movieRemoteRepositoryController.notifier).ref = ref;
       ref.watch(movieCollectionController.notifier).getSavedMovieId(id);
       bool isLoading = ref.watch(movieCollectionController);
 
@@ -40,94 +43,79 @@ class TMDBMovieDetailView extends StatelessWidget {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
+                          CachedNetworkImage(
+                            alignment: Alignment.topCenter,
+                            placeholder: (context, url) => const Center(
+                                child: SpinKitDoubleBounce(color: Colors.grey)),
+                            fit: BoxFit.cover,
+                            imageUrl: baseImageUrl + data.posterPath!,
+                            errorWidget: ((context, url, error) => Container()),
+                          ),
                           Stack(
                             alignment: AlignmentDirectional.bottomCenter,
                             clipBehavior: Clip.none,
                             children: [
-                              CachedNetworkImage(
-                                alignment: Alignment.topCenter,
-                                placeholder: (context, url) => const Center(
-                                    child: SpinKitDoubleBounce(
-                                        color: Colors.grey)),
-                                fit: BoxFit.cover,
-                                imageUrl: baseImageUrl + data.posterPath!,
-                                errorWidget: ((context, url, error) =>
-                                    Container()),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                left: 0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Overview',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w800),
-                                      ),
-                                      Text(data.overview!),
-                                      CustomButton(
-                                        onPressed: () {},
-                                        child: Row(
-                                          children: const [
-                                            Text('View in browser'),
-                                            Icon(Icons.keyboard_arrow_right)
-                                          ],
-                                        ),
-                                      ),
-                                      ref
-                                          .watch(
-                                              movieExistInCollectionFutureProvider(
-                                                  id))
-                                          .when(
-                                              data: (isExist) => !isExist
-                                                  ? CustomButton(
-                                                      radius: 16,
-                                                      color: Colors.red,
-                                                      child: ButtonLoader(
-                                                          isLoading: isLoading,
-                                                          text:
-                                                              'Save to device'),
-                                                      onPressed: () =>
-                                                          n.saveMovieToDevice(
-                                                              ref, data),
-                                                    )
-                                                  : CustomButton(
-                                                      radius: 16,
-                                                      color: Colors.red,
-                                                      child: ButtonLoader(
-                                                          isLoading: isLoading,
-                                                          text:
-                                                              'Remove from device'),
-                                                      onPressed: () =>
-                                                          n.removeSavedMovie(
-                                                              ref, data),
-                                                    ),
-                                              error: (e, t) =>
-                                                  const SizedBox.shrink(),
-                                              loading: () =>
-                                                  const SizedBox.shrink())
-                                    ],
-                                  ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data.overview!,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      data.releaseDate!,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.grey),
+                                    )
+                                  ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
+                          const SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: buildButton(ref, isLoading, n, data),
+                          ),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
                   ),
-              error: (e, t) => const Center(
-                    child: Text('Something went wrong'),
+              error: (e, t) => Center(
+                    child: MovieErrorWidget(
+                        onTap: () => ref
+                            .refresh(tmdbmovieFutureProvider(id.toString()))),
                   ),
               loading: () => const Center(
                     child: CircularProgressIndicator(),
                   )));
     });
+  }
+
+  Widget buildButton(WidgetRef ref, bool isLoading, MovieCollectionController n,
+      TMDBMovieResponseData data) {
+    return ref.watch(movieExistInCollectionFutureProvider(id)).when(
+        data: (isExist) => !isExist
+            ? CustomButton(
+                radius: 16,
+                color: Colors.red,
+                child:
+                    ButtonLoader(isLoading: isLoading, text: 'Save to device'),
+                onPressed: () => n.saveMovieToDevice(ref, data),
+              )
+            : CustomButton(
+                radius: 16,
+                color: Colors.red,
+                child: ButtonLoader(
+                    isLoading: isLoading, text: 'Remove from device'),
+                onPressed: () => n.removeSavedMovie(ref, data),
+              ),
+        error: (e, t) => const SizedBox.shrink(),
+        loading: () => const SizedBox.shrink());
   }
 }

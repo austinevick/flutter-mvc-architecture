@@ -7,11 +7,15 @@ import '../model/yts_movie_model.dart';
 import '../service/remote_movie_repository_service.dart';
 
 final movieRemoteRepositoryController =
-    Provider.autoDispose((ref) => MovieRemoteRepositoryController());
+    StateNotifierProvider.autoDispose<MovieRemoteRepositoryController, int>(
+        (ref) => MovieRemoteRepositoryController());
 
-class MovieRemoteRepositoryController {
+class MovieRemoteRepositoryController extends StateNotifier<int> {
+  MovieRemoteRepositoryController() : super(0);
   final ctrl = TextEditingController();
   WidgetRef? ref;
+
+  void setSelectedIndex(int index) => state = index;
 
   Future<TMDBMovieResponseModel> searchTMDBMoviesByTitle(WidgetRef ref) async {
     try {
@@ -27,13 +31,28 @@ class MovieRemoteRepositoryController {
     }
   }
 
+  Future<List<YTSMoviesResponseModel>> searchYTSMoviesByTitle(
+      WidgetRef ref) async {
+    try {
+      return await ref
+          .watch(movieRepositoryProvider)
+          .searchYTSMoviesByTitle(ctrl.text);
+    } on SocketException catch (_) {
+      showDialogFlash();
+      rethrow;
+    } catch (_) {
+      showBottomFlash(content: somethingwentwrong);
+      rethrow;
+    }
+  }
+
   Future<TMDBMovieResponseData> getTMDBMovieDetailsById(String id) async {
     try {
       return await ref!
           .watch(movieRepositoryProvider)
           .getTMDBMovieDetailsById(id);
     } on SocketException catch (_) {
-      showBottomFlash(content: 'No internet connection');
+      showDialogFlash();
       rethrow;
     } catch (_) {
       showBottomFlash(content: 'Unknown error');

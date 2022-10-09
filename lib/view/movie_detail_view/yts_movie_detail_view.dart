@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:movie_search_app/controller/movie_remote_repository_controller.dart';
 import 'package:movie_search_app/model/yts_movie_model.dart';
+import 'package:movie_search_app/widget/custom_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class YTSMovieDetailView extends StatelessWidget {
   final YTSMoviesResponseModel model;
@@ -12,81 +14,81 @@ class YTSMovieDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      ref.watch(movieRemoteRepositoryController).ref = ref;
+      ref.watch(movieRemoteRepositoryController.notifier).ref = ref;
 
       return Scaffold(
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              top: 0,
-              right: 0,
-              left: 0,
-              child: CachedNetworkImage(
-                alignment: Alignment.topCenter,
-                placeholder: (context, url) => const Center(
-                    child: SpinKitDoubleBounce(color: Colors.grey)),
-                fit: BoxFit.cover,
-                imageUrl: model.largeCoverImage!,
-                errorWidget: ((context, url, error) => Container()),
-              ),
-            ),
-            Positioned(
-              right: 0,
-              left: 0,
-              bottom: 0,
-              child: Container(
-                height: MediaQuery.of(context).size.height / 2,
-                decoration: const BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25))),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        model.title!,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w800),
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                Colors.black.withOpacity(0),
+                Colors.black.withOpacity(0.8),
+                Colors.black,
+                Colors.black,
+                Colors.black,
+              ])),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  alignment: Alignment.topCenter,
+                  placeholder: (context, url) => const Center(
+                      child: SpinKitDoubleBounce(color: Colors.grey)),
+                  fit: BoxFit.cover,
+                  imageUrl: model.largeCoverImage!,
+                  errorWidget: ((context, url, error) => Container()),
+                ),
+                Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            model.summary!,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            model.year.toString(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Colors.grey),
+                          )
+                        ],
                       ),
-                      Text(model.year.toString()),
-                      const SizedBox(height: 15),
-                      const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Overview',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w800),
-                          )),
-                      Text(model.summary!),
-                      const Spacer(),
-                      // ref.watch(movieIdFutureProvider(model.id!)).when(
-                      //     data: (data) => !data
-                      //         ? CustomButton(
-                      //             radius: 16,
-                      //             color: Colors.red,
-                      //             text: 'Save to device',
-                      //             onPressed: () => n.saveMovie(ref, model),
-                      //           )
-                      //         : CustomButton(
-                      //             radius: 16,
-                      //             color: Colors.red,
-                      //             child: ButtonLoader(
-                      //                 isLoading: isLoading,
-                      //                 text: 'Remove from device'),
-                      //             onPressed: () =>
-                      //                 n.removeSavedMovie(ref, model),
-                      //           ),
-                      //     error: (e, t) => const SizedBox.shrink(),
-                      //     loading: () => const SizedBox.shrink())
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomButton(
+                    radius: 16,
+                    color: Colors.red,
+                    onPressed: () => launchUrl(Uri.parse(model.url!),
+                        mode: LaunchMode.externalApplication),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text('View in browser'),
+                        SizedBox(width: 6),
+                        Icon(Icons.launch),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
         ),
       );
     });

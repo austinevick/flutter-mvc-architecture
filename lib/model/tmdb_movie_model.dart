@@ -16,11 +16,12 @@ class TMDBMovieResponseModel {
 class TMDBMovieResponseData {
   bool? adult;
   String? backdropPath;
-  List<dynamic>? genreIds;
+  List<dynamic>? genres;
   int? id;
   String? originalLanguage;
   String? originalTitle;
   String? overview;
+  String? homepage;
   double? popularity;
   String? posterPath;
   String? releaseDate;
@@ -32,13 +33,14 @@ class TMDBMovieResponseData {
   TMDBMovieResponseData(
       {this.adult,
       this.backdropPath,
-      this.genreIds,
+      this.genres,
       this.id,
       this.originalLanguage,
       this.originalTitle,
       this.overview,
       this.popularity,
       this.posterPath,
+      this.homepage,
       this.releaseDate,
       this.title,
       this.video,
@@ -48,8 +50,9 @@ class TMDBMovieResponseData {
   TMDBMovieResponseData.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    genreIds = json['genre_ids'];
+    genres = json['genres'];
     id = json['id'];
+    homepage = json['homepage'];
     originalLanguage = json['original_language'];
     originalTitle = json['original_title'];
     overview = json['overview'];

@@ -16,7 +16,8 @@ class MovieSearchView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final movieRepositoryCtrl = ref.watch(movieRemoteRepositoryController);
+      final movieRepositoryCtrl =
+          ref.watch(movieRemoteRepositoryController.notifier);
       final movieHistoryCtrl = ref.watch(movieSearchHistoryController);
       return Scaffold(
         appBar: PreferredSize(
@@ -40,7 +41,7 @@ class MovieSearchView extends StatelessWidget {
           minimum: const EdgeInsets.symmetric(horizontal: 16),
           child: movieRepositoryCtrl.ctrl.text.isEmpty
               ? const SearchHistoryList()
-              : ref.watch(searchMovieFutureProvider(ref)).when(
+              : ref.watch(searchTMDBMovieFutureProvider(ref)).when(
                   data: (data) => data.results == null
                       ? const SizedBox.shrink()
                       : Padding(
@@ -49,7 +50,6 @@ class MovieSearchView extends StatelessWidget {
                               itemCount: data.results!.length,
                               itemBuilder: (ctx, i) => ListTile(
                                     onTap: () {
-                                      Navigator.of(context).pop();
                                       movieHistoryCtrl
                                           .saveSearchHistory(data.results![i]);
                                       Navigator.of(context).push(
@@ -83,8 +83,8 @@ class MovieSearchView extends StatelessWidget {
                         ),
                   error: (e, t) => Center(
                         child: MovieErrorWidget(
-                            onTap: () =>
-                                ref.refresh(searchMovieFutureProvider(ref))),
+                            onTap: () => ref
+                                .refresh(searchTMDBMovieFutureProvider(ref))),
                       ),
                   loading: () => const Center(
                         child: CircularProgressIndicator(),
@@ -93,7 +93,7 @@ class MovieSearchView extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             FocusScope.of(context).unfocus();
-            ref.refresh(searchMovieFutureProvider(ref));
+            ref.refresh(searchTMDBMovieFutureProvider(ref));
           },
           backgroundColor: Colors.red,
           child: const Icon(Icons.search, color: Colors.white),
