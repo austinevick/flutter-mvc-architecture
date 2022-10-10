@@ -1,4 +1,5 @@
-# movie_search_app
+# Flutter MVC Architecture
+## A practical approach to MVC (Model View Controller) pattern in Flutter with Riverpod.
 
 A new Flutter project.
 
