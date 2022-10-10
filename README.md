@@ -1,6 +1,11 @@
 # Flutter MVC Architecture
 ## A practical approach to MVC (Model View Controller) pattern in Flutter with Riverpod.
 
+![](https://github.com/austinevick/flutter-mvc-architecture/blob/main/screenshot/Screenshot_20221010-005100.png)
+![](https://github.com/austinevick/flutter-mvc-architecture/blob/main/screenshot/Screenshot_20221010-005131.png)
+![](https://github.com/austinevick/flutter-mvc-architecture/blob/main/screenshot/Screenshot_20221010-005145.png)
+
+
 A new Flutter project.
 
 ## Getting Started
