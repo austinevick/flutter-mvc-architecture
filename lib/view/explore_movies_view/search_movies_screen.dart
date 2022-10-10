@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
 import '../../common/api.dart';
 import '../../controller/movie_remote_repository_controller.dart';
 import '../../providers.dart';
@@ -81,7 +80,7 @@ class SearchMovies extends StatelessWidget {
                               loading: () => const Center(
                                     child: CircularProgressIndicator(),
                                   ))
-                          : ref.watch(ytsMovieFutureProvider(ref)).when(
+                          : ref.watch(searchYTSMovieFutureProvider(ref)).when(
                               data: (data) => Expanded(
                                     child: GestureDetector(
                                       onHorizontalDragUpdate: (details) =>

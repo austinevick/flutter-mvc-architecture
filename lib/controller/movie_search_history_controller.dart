@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../common/api.dart';
 import '../model/search_history.dart';
 import '../model/tmdb_movie_model.dart';

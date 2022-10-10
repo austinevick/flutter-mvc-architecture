@@ -61,4 +61,4 @@ void showDialogFlash() {
 const noConnection = 'No internet connection';
 const somethingwentwrong = 'Something went wrong';
 String emptyViewText =
-    "No search history\nBegin by clicking the + button to search and save your favorite movies here.";
+    "No movie collection\nBegin by clicking the + button to search and save your favorite movies here.";
