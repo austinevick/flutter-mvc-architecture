@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../common/api.dart';
 import '../common/utils.dart';
-import '../model/saved_movie_model.dart';
+import '../model/movie_collection_model.dart';
 import '../model/tmdb_movie_model.dart';
 import '../providers.dart';
-import '../service/local_movie_repository_service.dart';
+import '../service/movie_collection_repository_service.dart';
 
 final movieCollectionController =
     StateNotifierProvider<MovieCollectionController, bool>(
@@ -15,14 +15,14 @@ class MovieCollectionController extends StateNotifier<bool> {
 
   Future<void> saveMovieToDevice(
       WidgetRef ref, TMDBMovieResponseData model) async {
-    final movie = SavedMovieModel(
+    final movie = MovieCollectionModel(
         title: model.title,
         movieId: model.id,
         overview: model.overview,
         image: baseImageUrl + model.posterPath!);
     try {
       state = true;
-      await LocalMovieRepositoryService.saveMovie(movie);
+      await MovieCollectionRepositoryService.saveMovie(movie);
       await Future.delayed(
         const Duration(seconds: 2),
       ).whenComplete(() {
@@ -80,11 +80,11 @@ class MovieCollectionController extends StateNotifier<bool> {
     return isAvailable;
   }
 
-  Future<List<SavedMovieModel>> getSavedMovies() async {
-    return await LocalMovieRepositoryService.getSavedMovies();
+  Future<List<MovieCollectionModel>> getSavedMovies() async {
+    return await MovieCollectionRepositoryService.getSavedMovies();
   }
 
   Future<void> deleteMovie(int id) async {
-    await LocalMovieRepositoryService.deleteSearchMovie(id);
+    await MovieCollectionRepositoryService.deleteSearchMovie(id);
   }
 }

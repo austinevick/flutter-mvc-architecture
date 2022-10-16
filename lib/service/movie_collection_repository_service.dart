@@ -1,9 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../model/saved_movie_model.dart';
+import '../model/movie_collection_model.dart';
 
-class LocalMovieRepositoryService {
+class MovieCollectionRepositoryService {
   static const String TABLE = 'movie';
   static const String DB_NAME = 'movie.db';
   static const String ID = 'id';
@@ -26,15 +26,15 @@ class LocalMovieRepositoryService {
         '''CREATE TABLE $TABLE ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $TITLE TEXT, $RELEASEDATE TEXT, $MOVIEID INTEGER, $IMAGE TEXT, $OVERVIEW TEXT)''');
   }
 
-  static Future<int> saveMovie(SavedMovieModel model) async {
+  static Future<int> saveMovie(MovieCollectionModel model) async {
     var dbClient = await _db;
     return await dbClient!.insert(TABLE, model.toMap());
   }
 
-  static Future<List<SavedMovieModel>> getSavedMovies() async {
+  static Future<List<MovieCollectionModel>> getSavedMovies() async {
     var dbClient = await _db;
     List<Map<String, dynamic>> map = await dbClient!.query(TABLE);
-    return map.map((e) => SavedMovieModel.fromMap(e)).toList();
+    return map.map((e) => MovieCollectionModel.fromMap(e)).toList();
   }
 
   static Future<int> deleteSearchMovie(int id) async {

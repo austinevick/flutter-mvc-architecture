@@ -29,13 +29,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.9.0"
-  beamer:
-    dependency: "direct main"
-    description:
-      name: beamer
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.5.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -247,13 +240,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  go_router:
-    dependency: "direct main"
-    description:
-      name: go_router
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.0.5"
   html:
     dependency: transitive
     description:
@@ -303,13 +289,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   matcher:
     dependency: transitive
     description:

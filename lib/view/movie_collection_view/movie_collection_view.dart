@@ -9,8 +9,8 @@ import '../../providers.dart';
 import '../movie_detail_view/tmdb_movie_detail_view.dart';
 import '../movie_search_view/movie_search_view.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class MovieCollectionView extends StatelessWidget {
+  const MovieCollectionView({super.key});
 
   @override
   Widget build(BuildContext context) {

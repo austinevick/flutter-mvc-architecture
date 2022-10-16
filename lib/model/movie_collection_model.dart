@@ -1,11 +1,11 @@
-class SavedMovieModel {
+class MovieCollectionModel {
   final int? id;
   final int? movieId;
   final String? title;
   final String? image;
   final String? overview;
   final String? releaseDate;
-  SavedMovieModel({
+  MovieCollectionModel({
     this.id,
     this.title,
     this.image,
@@ -25,8 +25,8 @@ class SavedMovieModel {
     };
   }
 
-  factory SavedMovieModel.fromMap(Map<String, dynamic> map) {
-    return SavedMovieModel(
+  factory MovieCollectionModel.fromMap(Map<String, dynamic> map) {
+    return MovieCollectionModel(
       id: map['id'],
       title: map['title'] ?? '',
       image: map['image'],

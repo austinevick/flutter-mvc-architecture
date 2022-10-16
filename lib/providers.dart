@@ -48,6 +48,5 @@ final tmdbMovieFutureProvider = FutureProvider.family.autoDispose(
         ref.watch(movieRemoteRepositoryController.notifier).getTMDBMovies(n));
 
 //Search history list provider
-
 final searchedMovieFutureProvider = FutureProvider.autoDispose(
     (ref) => ref.watch(movieSearchHistoryController).getSearchHistory());
