@@ -78,6 +78,7 @@ class MovieRemoteRepositoryController extends StateNotifier<int> {
     try {
       return await ref.watch(movieRepositoryProvider).getYTSMovies();
     } on SocketException catch (_) {
+      showDialogFlash();
       rethrow;
     } catch (_) {
       showBottomFlash(content: somethingwentwrong);
@@ -96,18 +97,4 @@ class MovieRemoteRepositoryController extends StateNotifier<int> {
       rethrow;
     }
   }
-
-  // Future<TMDBMovieResponseData> getTMDBMovieDetailsById(String id) async {
-  //   try {
-  //     return await ref!
-  //         .watch(movieRepositoryProvider)
-  //         .getTMDBMovieDetailsById(id);
-  //   } on SocketException catch (_) {
-  //     showBottomFlash(content: noConnection);
-  //     rethrow;
-  //   } catch (_) {
-  //     showBottomFlash(content: somethingwentwrong);
-  //     rethrow;
-  //   }
-  // }
 }

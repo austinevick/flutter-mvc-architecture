@@ -23,21 +23,10 @@ class SearchMovies extends StatelessWidget {
       final notifier = ref.watch(movieRemoteRepositoryController.notifier);
       return Scaffold(
         appBar: PreferredSize(
-            preferredSize: const Size(60, 60),
+            preferredSize: const Size(70, 70),
             child: Padding(
               padding: const EdgeInsets.only(left: 16, top: 50, right: 16),
-              child: Row(
-                children: [
-                  IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.keyboard_backspace, size: 32)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                      child: CustomTextField(
-                    controller: movieRepositoryCtrl.ctrl,
-                  )),
-                ],
-              ),
+              child: CustomTextField(controller: movieRepositoryCtrl.ctrl),
             )),
         body: SafeArea(
             minimum: const EdgeInsets.symmetric(horizontal: 12),
@@ -50,6 +39,7 @@ class SearchMovies extends StatelessWidget {
                         children: [
                           buildButton('TMDB',
                               () => notifier.setSelectedIndex(0), ref, 0),
+                          const SizedBox(width: 10),
                           buildButton('YTS.MX',
                               () => notifier.setSelectedIndex(1), ref, 1)
                         ],
@@ -74,9 +64,17 @@ class SearchMovies extends StatelessWidget {
                                               )),
                                     ),
                                   ),
-                              error: (e, t) => MovieErrorWidget(
-                                  onTap: () => ref
-                                      .refresh(tmdbMovieFutureProvider(ref))),
+                              error: (e, t) => Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(height: 150),
+                                      MovieErrorWidget(
+                                          onTap: () => ref.refresh(
+                                              searchTMDBMovieFutureProvider(
+                                                  ref))),
+                                    ],
+                                  ),
                               loading: () => const Center(
                                     child: CircularProgressIndicator(),
                                   ))
@@ -96,9 +94,17 @@ class SearchMovies extends StatelessWidget {
                                                       model: data[i]))),
                                     ),
                                   ),
-                              error: (e, t) => MovieErrorWidget(
-                                  onTap: () =>
-                                      ref.refresh(ytsMovieFutureProvider(ref))),
+                              error: (e, t) => Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(height: 150),
+                                      MovieErrorWidget(
+                                          onTap: () => ref.refresh(
+                                              searchYTSMovieFutureProvider(
+                                                  ref))),
+                                    ],
+                                  ),
                               loading: () => const Center(
                                     child: CircularProgressIndicator(),
                                   )),

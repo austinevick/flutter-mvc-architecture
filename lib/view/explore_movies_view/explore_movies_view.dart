@@ -23,7 +23,7 @@ class ExploreMovieView extends StatelessWidget {
             minimum: const EdgeInsets.symmetric(horizontal: 8),
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
                   Row(
@@ -46,6 +46,7 @@ class ExploreMovieView extends StatelessWidget {
                     children: [
                       buildButton(
                           'TMDB', () => notifier.setSelectedIndex(0), ref, 0),
+                      const SizedBox(width: 10),
                       buildButton(
                           'YTS.MX', () => notifier.setSelectedIndex(1), ref, 1)
                     ],
@@ -71,9 +72,15 @@ class ExploreMovieView extends StatelessWidget {
                                           )),
                                 ),
                               ),
-                          error: (e, t) => MovieErrorWidget(
-                              onTap: () =>
-                                  ref.refresh(tmdbMovieFutureProvider(ref))),
+                          error: (e, t) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(height: 150),
+                                  MovieErrorWidget(
+                                      onTap: () => ref.refresh(
+                                          tmdbMovieFutureProvider(ref))),
+                                ],
+                              ),
                           loading: () => const Center(
                                 child: CircularProgressIndicator(),
                               ))
@@ -94,9 +101,15 @@ class ExploreMovieView extends StatelessWidget {
                                               model: data[i]))),
                                 ),
                               ),
-                          error: (e, t) => MovieErrorWidget(
-                              onTap: () =>
-                                  ref.refresh(ytsMovieFutureProvider(ref))),
+                          error: (e, t) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(height: 150),
+                                  MovieErrorWidget(
+                                      onTap: () => ref.refresh(
+                                          ytsMovieFutureProvider(ref))),
+                                ],
+                              ),
                           loading: () => const Center(
                                 child: CircularProgressIndicator(),
                               )),
@@ -110,18 +123,20 @@ class ExploreMovieView extends StatelessWidget {
 
 Widget buildButton(String text, VoidCallback onTap, WidgetRef ref, int i) {
   final index = ref.watch(movieRemoteRepositoryController);
-  return AnimatedContainer(
-    height: 50,
-    width: 155,
-    decoration: BoxDecoration(
-        border: Border(
-            bottom: BorderSide(
-                width: 3, color: index == i ? Colors.red : Colors.grey))),
-    duration: const Duration(milliseconds: 650),
-    child: MaterialButton(
-      onPressed: onTap,
-      padding: const EdgeInsets.all(0),
-      child: Text(text),
+  return Expanded(
+    child: AnimatedContainer(
+      height: 50,
+      width: 155,
+      decoration: BoxDecoration(
+          border: Border(
+              bottom: BorderSide(
+                  width: 3, color: index == i ? Colors.red : Colors.grey))),
+      duration: const Duration(milliseconds: 650),
+      child: MaterialButton(
+        onPressed: onTap,
+        padding: const EdgeInsets.all(0),
+        child: Text(text),
+      ),
     ),
   );
 }
