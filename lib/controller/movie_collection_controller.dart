@@ -59,25 +59,22 @@ class MovieCollectionController extends StateNotifier<bool> {
 
   Future<int> getSavedMovieId(int id) async {
     var movie = await getSavedMovies();
-    int movieId = 0;
     for (var i = 0; i < movie.length; i++) {
       if (movie[i].movieId == id) {
-        movieId = movie[i].id!;
-        print(movieId);
+        return movie[i].id!;
       }
     }
-    return movieId;
+    return 0;
   }
 
   Future<bool> checkIfMovieExistInDatabase(int id) async {
     final movie = await getSavedMovies();
-    bool isAvailable = false;
     for (var i = 0; i < movie.length; i++) {
       if (movie[i].movieId == id) {
-        isAvailable = true;
+        return true;
       }
     }
-    return isAvailable;
+    return false;
   }
 
   Future<List<MovieCollectionModel>> getSavedMovies() async {
