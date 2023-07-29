@@ -11,13 +11,12 @@ final movieSearchHistoryController =
 class MovieSearchHistoryController {
   Future<bool> checkIfSearchedMovieExistInDatabase(int id) async {
     final movie = await getSearchHistory();
-    bool isAvailable = false;
     for (var i = 0; i < movie.length; i++) {
       if (movie[i].movieId == id) {
-        isAvailable = true;
+        return true;
       }
     }
-    return isAvailable;
+    return false;
   }
 
   Future<List<SearchHistoryModel>> getSearchHistory() async {

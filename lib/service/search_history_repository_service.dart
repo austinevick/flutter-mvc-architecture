@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:movie_search_app/model/search_history.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
